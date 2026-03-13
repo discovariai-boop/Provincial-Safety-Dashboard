@@ -1,15 +1,23 @@
-import Image from "next/image";
+'use client';
+
+import { useMemo } from "react";
+import dynamic from "next/dynamic";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { executiveKpis, incidents } from "@/lib/data";
 import { PlayCircle, Pin, Clock, User, Car, Siren, Users } from "lucide-react";
 import KpiCard from "./kpi-card";
 import { cn } from "@/lib/utils";
 
 export default function LiveIncidents() {
-  const mapImage = PlaceHolderImages.find(p => p.id === 'heatmap-map');
+  const SmartMap = useMemo(() => dynamic(
+    () => import('@/components/dashboard/smart-map'),
+    { 
+        loading: () => <div className="h-full w-full bg-muted animate-pulse"></div>,
+        ssr: false 
+    }
+  ), []);
 
   const getPriorityClass = (priority: string) => {
     switch (priority) {
@@ -43,22 +51,7 @@ export default function LiveIncidents() {
         <div className="grid gap-8 lg:grid-cols-3">
           <div className="lg:col-span-2">
             <div className="relative aspect-[2/1] w-full overflow-hidden rounded-lg border-2 border-primary/50 shadow-inner shadow-primary/20">
-              {mapImage && (
-                <Image
-                  src={mapImage.imageUrl}
-                  alt={mapImage.description}
-                  fill
-                  style={{ objectFit: 'cover' }}
-                  data-ai-hint={mapImage.imageHint}
-                  className="opacity-70"
-                />
-              )}
-              <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent"></div>
-              <div className="absolute top-2 right-2 flex gap-2">
-                  <div className="flex items-center gap-1.5 text-xs"><div className="w-2 h-2 rounded-full bg-red-500 animate-pulse-slow"></div>Crash</div>
-                  <div className="flex items-center gap-1.5 text-xs"><div className="w-2 h-2 rounded-full bg-orange-500 animate-pulse-slow"></div>Heist</div>
-                  <div className="flex items-center gap-1.5 text-xs"><div className="w-2 h-2 rounded-full bg-yellow-500 animate-pulse-slow"></div>Robbery</div>
-              </div>
+              <SmartMap />
             </div>
             <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
                 {executiveKpis.map(kpi => <KpiCard key={kpi.title} {...kpi} />)}
