@@ -1,12 +1,12 @@
 import Image from "next/image";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { executiveKpis, incidents } from "@/lib/data";
 import { PlayCircle, Pin, Clock, User, Car, Siren, Users } from "lucide-react";
 import KpiCard from "./kpi-card";
+import { cn } from "@/lib/utils";
 
 export default function LiveIncidents() {
   const mapImage = PlaceHolderImages.find(p => p.id === 'heatmap-map');
