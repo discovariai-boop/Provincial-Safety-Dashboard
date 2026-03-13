@@ -8,6 +8,7 @@
  */
 
 import {ai} from '@/ai/genkit';
+import {googleAI} from '@genkit-ai/google-genai';
 import {z} from 'zod';
 
 const PredictiveRiskAlertsInputSchema = z.object({
@@ -41,11 +42,11 @@ export async function predictiveRiskAlerts(input: PredictiveRiskAlertsInput): Pr
   return predictiveRiskAlertsFlow(input);
 }
 
-const predictiveRiskAlertsPrompt = ai.definePrompt({
+const prompt = ai.definePrompt({
   name: 'predictiveRiskAlertsPrompt',
   input: {schema: PredictiveRiskAlertsInputSchema},
   output: {schema: PredictiveRiskAlertsOutputSchema},
-  model: 'googleai/gemini-2.5-flash',
+  model: googleAI.model('gemini-2.5-flash'),
   prompt: `You are an advanced AI assistant for the Limpopo Premier's Office, specialized in predictive analytics for safety and traffic management. Your goal is to analyze real-time incident data, historical patterns, and external environmental factors to predict potential high-risk areas or incidents. Based on your analysis, you must generate concise, actionable alerts with suggested preemptive measures to help the Premier deploy resources effectively and prevent crises.
 
 Here is the current operational data:
@@ -79,7 +80,7 @@ const predictiveRiskAlertsFlow = ai.defineFlow(
     outputSchema: PredictiveRiskAlertsOutputSchema,
   },
   async input => {
-    const {output} = await predictiveRiskAlertsPrompt(input);
+    const {output} = await prompt(input);
     return output!;
   }
 );
