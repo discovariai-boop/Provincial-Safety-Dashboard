@@ -1,3 +1,10 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "heatmap-map",
+      "description": "A dark-themed heatmap of the Limpopo province showing various incident hotspots.",
+      "imageUrl": "https://picsum.photos/seed/101/1200/600",
+      "imageHint": "dark map"
+    }
+  ]
 }
