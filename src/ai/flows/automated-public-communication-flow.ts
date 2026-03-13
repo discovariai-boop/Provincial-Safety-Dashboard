@@ -8,7 +8,7 @@
  */
 
 import { ai } from '@/ai/genkit';
-import { z } from 'genkit';
+import { z } from 'zod';
 
 const AutomatedPublicCommunicationInputSchema = z.object({
   incidentType: z.string().describe('The type of incident (e.g., "crash", "heist", "robbery").'),
@@ -35,6 +35,7 @@ const prompt = ai.definePrompt({
   name: 'generatePublicCommunicationPrompt',
   input: { schema: AutomatedPublicCommunicationInputSchema },
   output: { schema: AutomatedPublicCommunicationOutputSchema },
+  model: 'googleai/gemini-2.5-flash',
   prompt: `You are the Premier's communication officer for the Limpopo Provincial Intelligent Safety and Traffic Hub (LPISTH). Your task is to generate clear, concise, and positive public communications based on incident outcomes and key safety achievements.
 
 Generate three distinct outputs: a public update, a press release summary, and a social media post.

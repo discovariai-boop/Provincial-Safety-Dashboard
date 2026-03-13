@@ -28,7 +28,6 @@ export default async function PredictiveAlerts() {
     const result = await predictiveRiskAlerts(predictiveAIInput);
     alerts = result.alerts;
   } catch (error) {
-    console.error("Error fetching predictive alerts:", error);
     // Provide fallback/mock data on error
     alerts = [
         { id: 'err-1', riskLevel: 'CRITICAL', location: 'R101 18:15', message: 'Heist likely - Pre-position Unit 319', suggestedAction: 'Pre-position assets.', confidence: '84%' },

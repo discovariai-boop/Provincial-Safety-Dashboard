@@ -8,7 +8,7 @@
  */
 
 import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import {z} from 'zod';
 
 const PredictiveRiskAlertsInputSchema = z.object({
   currentIncidents: z.array(z.object({
@@ -45,6 +45,7 @@ const predictiveRiskAlertsPrompt = ai.definePrompt({
   name: 'predictiveRiskAlertsPrompt',
   input: {schema: PredictiveRiskAlertsInputSchema},
   output: {schema: PredictiveRiskAlertsOutputSchema},
+  model: 'googleai/gemini-2.5-flash',
   prompt: `You are an advanced AI assistant for the Limpopo Premier's Office, specialized in predictive analytics for safety and traffic management. Your goal is to analyze real-time incident data, historical patterns, and external environmental factors to predict potential high-risk areas or incidents. Based on your analysis, you must generate concise, actionable alerts with suggested preemptive measures to help the Premier deploy resources effectively and prevent crises.
 
 Here is the current operational data:
