@@ -1,16 +1,18 @@
 'use client';
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { executiveKpis, incidents } from "@/lib/data";
+import { executiveKpis, incidents, type Incident } from "@/lib/data";
 import { PlayCircle, Pin, Clock, User, Car, Siren, Users } from "lucide-react";
 import KpiCard from "./kpi-card";
 import { cn } from "@/lib/utils";
 
 export default function LiveIncidents() {
+  const [selectedCoords, setSelectedCoords] = useState<[number, number] | null>(null);
+
   const SmartMap = useMemo(() => dynamic(
     () => import('@/components/dashboard/smart-map'),
     { 
@@ -37,6 +39,10 @@ export default function LiveIncidents() {
     return <Siren className="h-4 w-4" />;
   };
 
+  const handleIncidentClick = (incident: Incident) => {
+    setSelectedCoords(incident.coords);
+  };
+
   return (
     <Card className="xl:col-span-2 border-2" x-chunk="dashboard-01-chunk-4">
       <CardHeader className="flex flex-row items-center">
@@ -51,7 +57,7 @@ export default function LiveIncidents() {
         <div className="grid gap-8 lg:grid-cols-3">
           <div className="lg:col-span-2">
             <div className="relative aspect-[2/1] w-full overflow-hidden rounded-lg border-2 border-primary/50 shadow-inner shadow-primary/20">
-              <SmartMap />
+              <SmartMap incidents={incidents} selectedCoords={selectedCoords} />
             </div>
             <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
                 {executiveKpis.map(kpi => <KpiCard key={kpi.title} {...kpi} />)}
@@ -62,7 +68,12 @@ export default function LiveIncidents() {
             <h3 className="font-headline text-lg mb-2">Active Incidents</h3>
              <div className="space-y-4">
                 {incidents.map((incident) => (
-                    <Card key={incident.id} className="bg-background/50 hover:bg-muted/50 transition-colors">
+                    <Card key={incident.id} 
+                      className={cn(
+                        "bg-background/50 hover:bg-muted/50 transition-colors cursor-pointer",
+                        selectedCoords === incident.coords && "border-primary shadow-lg shadow-primary/20 ring-2 ring-primary"
+                      )}
+                      onClick={() => handleIncidentClick(incident)}>
                         <CardHeader className="p-4">
                             <div className="flex justify-between items-start">
                                 <div>

@@ -19,7 +19,7 @@ export const incidents = [
         etaPolice: "3m 12s",
         etaAmbulance: "4m 30s",
         video: true,
-        coords: "23°57'S 29°27'E",
+        coords: [-23.855, 29.421] as [number, number],
         assigned: "Constable Mthembu",
         status: "En Route",
         icon: Car
@@ -32,7 +32,7 @@ export const incidents = [
         etaPolice: "6m 45s",
         etaSecurity: "5m 20s",
         video: true,
-        coords: "23°55'S 29°25'E",
+        coords: [-23.905, 29.45] as [number, number],
         assigned: "Unit 247",
         status: "En Route",
         icon: Siren
@@ -45,12 +45,14 @@ export const incidents = [
         etaPolice: "8m 10s",
         etaSecurity: "N/A",
         video: false,
-        coords: "23°54'S 29°27'E",
+        coords: [-23.901, 29.462] as [number, number],
         assigned: "Unit 102",
         status: "Dispatched",
         icon: Users
     },
 ];
+
+export type Incident = typeof incidents[0];
 
 export const workers = [
   {
