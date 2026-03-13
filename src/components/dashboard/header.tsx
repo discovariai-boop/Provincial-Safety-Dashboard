@@ -33,21 +33,22 @@ import AppSidebar from './sidebar';
 import { GuardianLogo } from '../icons';
 
 function Clock() {
-  const [time, setTime] = useState(new Date());
+  const [time, setTime] = useState<Date | null>(null);
 
   useEffect(() => {
+    setTime(new Date());
     const timerId = setInterval(() => setTime(new Date()), 1000);
     return () => clearInterval(timerId);
   }, []);
 
   return (
     <div className="text-sm font-medium text-muted-foreground">
-      {time.toLocaleTimeString('en-ZA', {
+      {time ? time.toLocaleTimeString('en-ZA', {
         hour: '2-digit',
         minute: '2-digit',
         second: '2-digit',
         timeZone: 'Africa/Johannesburg',
-      })}{' '}
+      }) : '--:--:--'}{' '}
       SAST
     </div>
   );
