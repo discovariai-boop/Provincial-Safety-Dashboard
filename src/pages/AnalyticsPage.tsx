@@ -10,6 +10,10 @@ import AICrimePanel from '@/components/analytics/AICrimePanel';
 import LiveEventsTicker from '@/components/analytics/LiveEventsTicker';
 import WeatherImpactPanel from '@/components/analytics/WeatherImpactPanel';
 import ProvincialMapWithWeather from '@/components/analytics/ProvincialMapWithWeather';
+import RoadsideSensorsPanel from '@/components/analytics/RoadsideSensorsPanel';
+import SmartTrafficLightsPanel from '@/components/analytics/SmartTrafficLightsPanel';
+import AIAnalysisEngine from '@/components/analytics/AIAnalysisEngine';
+import ProvincialMapWithSensors from '@/components/analytics/ProvincialMapWithSensors';
 import { useAuth } from '@/hooks/useAuth';
 import { useRole } from '@/hooks/useRole';
 
@@ -26,6 +30,7 @@ const AnalyticsPage: React.FC = () => {
   const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
   const [autoRefresh, setAutoRefresh] = useState(true);
   const [weatherIntensity, setWeatherIntensity] = useState(68);
+  const [aiQueryResponse, setAiQueryResponse] = useState<any>(null);
 
   // Update time every second
   useEffect(() => {
@@ -191,8 +196,24 @@ const AnalyticsPage: React.FC = () => {
 
         {/* Main Content Grid */}
         <div className="space-y-8">
-          {/* Weather Impact Panel (NEW) */}
+          {/* Weather Impact Panel */}
           <WeatherImpactPanel />
+
+          {/* AI Analysis Engine - Hero Section */}
+          <AIAnalysisEngine 
+            onQueryResponse={setAiQueryResponse}
+          />
+
+          {/* Roadside Sensors Panel */}
+          <RoadsideSensorsPanel />
+
+          {/* Smart Traffic Lights Panel */}
+          <SmartTrafficLightsPanel />
+
+          {/* Enhanced Map with Sensors & Lights */}
+          <ProvincialMapWithSensors 
+            highlightedLocations={aiQueryResponse?.highlightedLocations || []}
+          />
 
           {/* KPI Section */}
           <AnalyticsKPISection dateRange={dateRange} />
