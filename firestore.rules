@@ -1,0 +1,167 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function hasRole(role) {
+      return request.auth.token.role == role;
+    }
+
+    function hasRoles(roles) {
+      return request.auth.token.role in roles;
+    }
+
+    function isAdmin() {
+      return hasRoles(['premier', 'admin', 'national_executive']);
+    }
+
+    function isDepartmentUser() {
+      return request.auth.token.department != null;
+    }
+
+    function isInDepartment(dept) {
+      return request.auth.token.department == dept;
+    }
+
+    function isInLimpopo() {
+      return request.auth.token.province == 'limpopo' || request.auth.token.province == 'all';
+    }
+
+    // Citizens collection
+    match /citizens/{citizenId} {
+      allow create: if isAuthenticated();
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow update: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow delete: if isAuthenticated() && (
+        resource.data.userId == request.auth.uid || 
+        hasRole('admin')
+      );
+    }
+
+    // Incidents - core emergency data
+    match /incidents/{incidentId} {
+      allow create: if isAuthenticated() && isInLimpopo();
+      allow read: if isAuthenticated() && isInLimpopo() && (
+        resource.data.visibility == 'public' ||
+        resource.data.reporterId == request.auth.uid ||
+        hasRoles(['premier', 'minister', 'director', 'commander', 'chief', 'admin', 'analyst', 'national_executive']) ||
+        (isDepartmentUser() && isInDepartment(resource.data.department))
+      );
+      allow update: if isAuthenticated() && isInLimpopo() && (
+        hasRoles(['premier', 'minister', 'director', 'commander', 'chief', 'admin', 'national_executive']) ||
+        (isDepartmentUser() && isInDepartment(resource.data.department))
+      );
+      allow delete: if isAuthenticated() && (hasRoles(['premier', 'admin', 'national_executive']));
+    }
+
+    // Videos - citizen uploads and department access
+    match /videos/{videoId} {
+      allow create: if isAuthenticated(); // Citizens can upload
+      allow read: if isAuthenticated() && isInLimpopo() && (
+        hasRoles(['premier', 'minister', 'director', 'commander', 'chief', 'admin', 'analyst', 'national_executive']) ||
+        (isDepartmentUser() && isInDepartment(resource.data.department))
+      );
+      allow delete: if isAuthenticated() && (
+        resource.data.uploadedBy == request.auth.uid ||
+        hasRoles(['premier', 'admin', 'national_executive'])
+      );
+    }
+
+    // Responders - officer/unit tracking
+    match /responders/{responderId} {
+      allow read, write: if isAuthenticated() && isInLimpopo() && (
+        hasRoles(['premier', 'minister', 'admin', 'national_executive']) ||
+        (isDepartmentUser() && isInDepartment(resource.data.department))
+      );
+    }
+
+    // KPI metrics - department specific
+    match /kpis/{kpiId} {
+      allow read: if isAuthenticated() && isInLimpopo() && (
+        hasRoles(['premier', 'minister', 'director', 'commander', 'chief', 'analyst', 'national_executive']) ||
+        (isDepartmentUser() && isInDepartment(resource.data.department))
+      );
+      allow write: if isAuthenticated() && (
+        hasRoles(['premier', 'admin', 'national_executive']) ||
+        (isDepartmentUser() && isInDepartment(resource.data.department) && hasRoles(['director', 'commander', 'chief']))
+      );
+    }
+
+    // Hospital capacity - EMS/Health only
+    match /hospitalCapacity/{id} {
+      allow read, write: if isAuthenticated() && isInLimpopo() && (
+        isInDepartment('ems') ||
+        isInDepartment('health') ||
+        hasRoles(['premier', 'minister', 'admin', 'national_executive'])
+      );
+    }
+
+    // Traffic management - Transport only
+    match /trafficData/{id} {
+      allow read, write: if isAuthenticated() && isInLimpopo() && (
+        isInDepartment('transport') ||
+        hasRoles(['premier', 'minister', 'admin', 'national_executive'])
+      );
+    }
+
+    // Infrastructure - RAL only
+    match /infrastructure/{id} {
+      allow read, write: if isAuthenticated() && isInLimpopo() && (
+        isInDepartment('ral') ||
+        hasRoles(['premier', 'minister', 'admin', 'national_executive'])
+      );
+    }
+
+    // Predictions and AI insights
+    match /predictions/{id} {
+      allow read: if isAuthenticated() && isInLimpopo() && (
+        hasRoles(['premier', 'minister', 'director', 'commander', 'analyst', 'national_executive']) ||
+        isDepartmentUser()
+      );
+      allow write: if hasRoles(['premier', 'admin', 'national_executive']);
+    }
+
+    // Public communication
+    match /publicCommunication/{id} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && isInLimpopo() && (
+        hasRoles(['premier', 'minister', 'admin', 'national_executive'])
+      );
+    }
+
+    // User roles - admin management
+    match /users/{userId} {
+      allow read: if isAuthenticated() && (
+        request.auth.uid == userId ||
+        hasRoles(['premier', 'admin', 'national_executive'])
+      );
+      allow create: if hasRoles(['premier', 'admin', 'national_executive']);
+      allow update: if isAuthenticated() && (
+        request.auth.uid == userId ||
+        hasRoles(['premier', 'admin', 'national_executive'])
+      );
+      allow delete: if hasRoles(['premier', 'admin', 'national_executive']);
+    }
+
+    // Audit logs - admin only
+    match /auditLogs/{logId} {
+      allow read: if hasRoles(['premier', 'admin', 'national_executive']);
+      allow create: if isAuthenticated();
+      allow write: if hasRoles(['admin', 'national_executive']);
+    }
+
+    // System settings - admin only
+    match /systemSettings/{settingId} {
+      allow read: if hasRoles(['admin', 'national_executive']);
+      allow write: if hasRoles(['admin', 'national_executive']);
+    }
+
+    // Catch-all deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

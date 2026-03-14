@@ -1,0 +1,25 @@
+{
+  "functions": {
+    "runtime": "nodejs20",
+    "source": "functions",
+    "codebase": "default",
+    "ignore": ["node_modules", ".git", "dist", ".runtimeconfig.json"]
+  },
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  },
+  "storage": {
+    "rules": "storage.rules"
+  },
+  "hosting": {
+    "public": ".next/standalone/public",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}
