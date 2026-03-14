@@ -14,6 +14,7 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ activeSection, onSectionChange, role }) => {
   const menuItems = [
     { id: 'overview', label: 'Dashboard Overview', icon: LayoutDashboard, roles: ['premier', 'national_executive', 'minister', 'director', 'commander', 'chief', 'admin', 'analyst'] },
+    { id: 'analytics', label: 'Provincial Analytics', icon: BarChart3, roles: ['premier', 'national_executive', 'minister'] },
     { id: 'map', label: 'Provincial Smart Map', icon: Map, roles: ['premier', 'national_executive', 'minister', 'director', 'commander', 'chief', 'admin'] },
     { id: 'incidents', label: 'Live Incidents', icon: AlertCircle, roles: ['premier', 'national_executive', 'minister', 'director', 'commander', 'chief', 'admin'] },
     { id: 'metrics', label: 'Performance Metrics', icon: BarChart3, roles: ['premier', 'national_executive', 'minister', 'director', 'admin'] },

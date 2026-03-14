@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from '@/hooks/useAuth';
+import { AuthProvider, useAuth } from '@/hooks/useAuth';
 import { useRole } from '@/hooks/useRole';
 import Dashboard from '@/pages/Dashboard';
 import LoginPage from '@/pages/LoginPage';
 import UnauthorizedPage from '@/pages/UnauthorizedPage';
+import AnalyticsPage from '@/pages/AnalyticsPage';
 
 function AppContent() {
   const { user, loading } = useAuth();
@@ -30,6 +31,20 @@ function AppContent() {
           user ? (
             ['premier', 'national_executive', 'minister', 'director', 'commander', 'chief', 'admin'].includes(role) ? (
               <Dashboard />
+            ) : (
+              <UnauthorizedPage />
+            )
+          ) : (
+            <Navigate to="/login" replace />
+          )
+        }
+      />
+      <Route
+        path="/analytics"
+        element={
+          user ? (
+            ['premier', 'national_executive', 'minister'].includes(role) ? (
+              <AnalyticsPage />
             ) : (
               <UnauthorizedPage />
             )
