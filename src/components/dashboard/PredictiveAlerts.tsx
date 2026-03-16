@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { AlertTriangle, CheckCircle, Clock, MapPin } from 'lucide-react';
 
@@ -64,8 +64,49 @@ const PredictiveAlerts: React.FC = () => {
     },
   ]);
 
+  const prevAlertsRef = useRef<PredictionAlert[]>([]);
+  const audioRef = useRef<HTMLAudioElement>(null);
+
+  useEffect(() => {
+    // Simulate real-time updates for demonstration
+    const interval = setInterval(() => {
+      const newAlert: PredictionAlert = {
+        id: `alert-${Date.now()}`,
+        type: Math.random() > 0.5 ? 'crime' : 'weather',
+        location: `Simulated Location ${Math.floor(Math.random() * 100)}`,
+        risk: Math.floor(Math.random() * 100),
+        timeframe: 'Just now',
+        description: 'Simulated alert for demonstration purposes.',
+        confidence: Math.floor(Math.random() * 100),
+        icon: Math.random() > 0.5 ? <AlertTriangle className="w-5 h-5" /> : <MapPin className="w-5 h-5" />,
+        color: Math.random() > 0.5 ? 'from-red-500/20 to-red-600/20' : 'from-blue-500/20 to-blue-600/20',
+      };
+      setAlerts(prevAlerts => [newAlert, ...prevAlerts.slice(0, 3)]); // Keep only latest 4 alerts
+    }, 5000); // Add a new alert every 5 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const currentAlertIds = new Set(alerts.map(alert => alert.id));
+    const prevAlertIds = new Set(prevAlertsRef.current.map(alert => alert.id));
+
+    // Find newly added alerts
+    const newAlerts = alerts.filter(alert => !prevAlertIds.has(alert.id));
+
+    newAlerts.forEach(alert => {
+      if (alert.risk > 70 && audioRef.current) {
+        audioRef.current.play().catch(e => console.error("Error playing sound:", e));
+      }
+    });
+
+    prevAlertsRef.current = alerts;
+  }, [alerts]);
+
   return (
     <div className="space-y-4">
+      <audio ref={audioRef} src="/alert.mp3" preload="auto" />
+
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold text-white">Predictive Analytics</h3>
         <span className="text-xs font-medium text-slate-400">AI-powered forecasts</span>

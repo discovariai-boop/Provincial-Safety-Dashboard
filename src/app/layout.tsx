@@ -3,6 +3,7 @@ import './globals.css';
 import { cn } from '@/lib/utils';
 import { Toaster } from "@/components/ui/toaster"
 import Script from 'next/script'
+import 'leaflet/dist/leaflet.css';
 
 export const metadata: Metadata = {
   title: 'Guardian Command Center',

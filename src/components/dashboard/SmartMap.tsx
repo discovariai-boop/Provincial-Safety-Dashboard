@@ -1,12 +1,10 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, LayerGroup, Circle } from 'react-leaflet';
-import { LatLngExpression } from 'leaflet';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
+import React, { useState } from 'react';
+import { Marker, Popup, LayerGroup, Circle } from 'react-leaflet';
 import { motion } from 'framer-motion';
 import { AlertTriangle, Ambulance, Car, Zap } from 'lucide-react';
+import LeafletMapWrapper from '@/components/LeafletMapWrapper';
 
 interface MapLayer {
   id: string;
@@ -16,7 +14,7 @@ interface MapLayer {
   icon: React.ReactNode;
 }
 
-const SmartMap: React.FC = () => {
+const DashboardSmartMap: React.FC = () => {
   const [layers, setLayers] = useState<MapLayer[]>([
     { id: 'crime', name: 'Crime Hotspots', enabled: true, color: '#ef4444', icon: <AlertTriangle className="w-4 h-4" /> },
     { id: 'traffic', name: 'Traffic Congestion', enabled: true, color: '#f59e0b', icon: <Car className="w-4 h-4" /> },
@@ -24,7 +22,7 @@ const SmartMap: React.FC = () => {
     { id: 'power', name: 'Power Grid', enabled: false, color: '#fbbf24', icon: <Zap className="w-4 h-4" /> },
   ]);
 
-  const polokwanePosition: LatLngExpression = [-23.9003, 29.4316];
+  const polokwanePosition: [number, number] = [-23.9045, 29.4688];
 
   const crimeHotspots = [
     { lat: -23.85, lng: 29.42, intensity: 'high', incidents: 45 },
@@ -68,11 +66,10 @@ const SmartMap: React.FC = () => {
 
       {/* Map Container */}
       <div className="bg-gradient-to-br from-slate-700/50 to-slate-800/50 backdrop-blur-lg border border-slate-600/50 rounded-xl overflow-hidden h-[500px]">
-        <MapContainer center={polokwanePosition} zoom={11} style={{ width: '100%', height: '100%' }}>
-          <TileLayer
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution='&copy; OpenStreetMap contributors'
-          />
+        <LeafletMapWrapper center={polokwanePosition} zoom={10}>
+          <Marker position={polokwanePosition}>
+            <Popup>Polokwane</Popup>
+          </Marker>
 
           {/* Crime Hotspots */}
           {layers.find(l => l.id === 'crime')?.enabled && (
@@ -114,7 +111,7 @@ const SmartMap: React.FC = () => {
               ))}
             </LayerGroup>
           )}
-        </MapContainer>
+        </LeafletMapWrapper>
       </div>
 
       {/* Map Legend */}
@@ -133,4 +130,4 @@ const SmartMap: React.FC = () => {
   );
 };
 
-export default SmartMap;
+export default DashboardSmartMap;
